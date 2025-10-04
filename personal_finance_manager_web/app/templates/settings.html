@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Settings</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <h2 class="mb-4 text-center">⚙️ Settings</h2>
+
+  <!-- Dark Mode Toggle -->
+  <div class="mb-5">
+    <h5>🌗 Appearance</h5>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="darkModeToggle">
+      <label class="form-check-label" for="darkModeToggle">Enable Dark Mode</label>
+    </div>
+  </div>
+
+  <!-- Transaction Filter Preference -->
+  <div class="mb-5">
+    <h5>📆 Default Transaction Filter</h5>
+    <form method="POST" action="/settings/filter">
+      <select name="filter" class="form-select mb-2" required>
+        <option value="this_month" {% if current_filter == 'this_month' %}selected{% endif %}>This Month</option>
+        <option value="last_30_days" {% if current_filter == 'last_30_days' %}selected{% endif %}>Last 30 Days</option>
+        <option value="custom" {% if current_filter == 'custom' %}selected{% endif %}>Custom Range</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Save Preference</button>
+    </form>
+  </div>
+
+  <!-- Account Info -->
+  <div class="mb-5">
+    <h5>👤 Account Information</h5>
+    <form method="POST" action="/settings/update_account">
+      <input type="text" name="username" class="form-control mb-2" placeholder="Username" value="{{ user.username }}" required>
+      <input type="text" name="first_name" class="form-control mb-2" placeholder="First Name" value="{{ user.first_name }}">
+      <input type="text" name="last_name" class="form-control mb-2" placeholder="Last Name" value="{{ user.last_name }}">
+      <input type="email" name="email" class="form-control mb-2" placeholder="Email" value="{{ user.email }}">
+      <button type="submit" class="btn btn-success">Update Info</button>
+    </form>
+  </div>
+
+  <!-- Export Options -->
+  <div class="mb-4">
+    <h5>📁 Export Data</h5>
+    <a href="/settings/export/csv" class="btn btn-outline-secondary me-2">Export CSV</a>
+    <a href="/settings/export/pdf" class="btn btn-outline-secondary">Export PDF</a>
+  </div>
+
+  <a href="/dashboard" class="btn btn-link">← Back to Dashboard</a>
+</div>
+
+<script>
+  // Dark Mode Toggle - stored in localStorage
+  const toggle = document.getElementById('darkModeToggle');
+  const isDark = localStorage.getItem('darkMode') === 'true';
+
+  if (isDark) document.body.classList.add('dark-mode');
+  toggle.checked = isDark;
+
+  toggle.addEventListener('change', () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', toggle.checked);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

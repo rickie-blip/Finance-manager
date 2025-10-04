@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Finance Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+  <style>
+    .text-purple {
+      color: #6f42c1;
+    }
+    .border-purple {
+      border-left: 5px solid #6f42c1;
+    }
+    .sidebar a {
+      font-size: 1rem;
+      padding: 10px;
+      display: block;
+      color: #333;
+      text-decoration: none;
+    }
+    .sidebar a.active, .sidebar a:hover {
+      background-color: #d1e7dd;
+      font-weight: bold;
+      color: #0f5132;
+      border-radius: 5px;
+    }
+    .logo {
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+  </style>
+  <button onclick="toggleDarkMode()" class="btn btn-outline-secondary">🌓 Dark Mode🐱‍👤</button
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row min-vh-100">
+
+    <!-- Sidebar -->
+    <div class="col-md-2 bg-white shadow-sm sidebar py-4 px-3">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="Company Logo" class="logo">
+      <a href="#" class="active">🏠 Dashboard</a>
+      <a href="#">💳 Transactions</a>
+      <a href="#">📊 Budgets</a>
+      <a href="#">🎯 Financial Goals</a>
+      <a href="#">📲 M-Pesa Sync</a>
+      <a href="#">⚙️ Settings</a>
+    </div>
+
+    <!-- Main Content -->
+    <main class="col-md-10 p-4">
+      <h2 class="fw-bold">Financial Dashboard</h2>
+      <p class="text-muted">WELCOME BACK!</p>
+
+     
+
+      <!-- Summary Cards -->
+      <div class="row g-3 my-4">
+        <div class="col-md-3">
+          <div class="card border-start border-success shadow-sm">
+            <div class="card-body">
+              <p class="mb-1 text-muted">Monthly Income</p>
+              <h5 class="text-success">Ksh {{ monthly_income or 0 }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-start border-danger shadow-sm">
+            <div class="card-body">
+              <p class="mb-1 text-muted">Monthly Expenses</p>
+              <h5 class="text-danger">Ksh {{ monthly_expenses or 0 }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-start border-primary shadow-sm">
+            <div class="card-body">
+              <p class="mb-1 text-muted">Net Balance</p>
+              <h5 class="text-primary">Ksh {{ (monthly_income or 0) - (monthly_expenses or 0) }}</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card border-purple shadow-sm">
+            <div class="card-body">
+              <p class="mb-1 text-muted">Active Goals</p>
+              <h5 class="text-purple">{{ active_goals or 0 }}</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Income -->
+      <div class="mb-4">
+        <h5>Add Monthly Income</h5>
+        <form method="POST" action="/add_income" class="row g-2">
+          <div class="col-md-6">
+            <input type="number" name="amount" class="form-control" placeholder="Enter your salary (Ksh)" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-success w-100">Save Income</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Add Budget -->
+      <div class="mb-4">
+        <h5>Create Budget</h5>
+        <form method="POST" action="/add_budget" class="row g-2">
+          <div class="col-md-4">
+            <input type="text" name="category" class="form-control" placeholder="Budget Category (e.g. Food)" required>
+          </div>
+          <div class="col-md-4">
+            <input type="number" name="amount" class="form-control" placeholder="Amount (Ksh)" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add Budget</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Add Savings Goal -->
+      <div class="mb-4">
+        <h5>Create Savings Goal</h5>
+        <form method="POST" action="/add_savings" class="row g-2">
+          <div class="col-md-4">
+            <input type="text" name="goal_name" class="form-control" placeholder="Goal Name" required>
+          </div>
+          <div class="col-md-3">
+            <input type="number" name="target_amount" class="form-control" placeholder="Target Amount (Ksh)" required>
+          </div>
+          <div class="col-md-3">
+            <input type="date" name="deadline" class="form-control" required>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-warning w-100">Add Goal</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Transactions -->
+      <div class="mb-4">
+        <h5>Recent Transactions</h5>
+        <ul class="list-group">
+          {% for txn in transactions %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span>{{ txn['date'] }} | {{ txn['category'] }} - Ksh {{ txn['amount'] }} ({{ txn['type'] }})</span>
+            </li>
+          {% else %}
+            <li class="list-group-item text-muted">No transactions recorded.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Savings Overview -->
+      <div class="mb-4">
+        <h5>Savings Goals</h5>
+        <ul class="list-group">
+          {% for s in savings %}
+            <li class="list-group-item">
+              <strong>{{ s['name'] }}</strong>: Saved Ksh {{ s['saved_amount'] }} / Ksh {{ s['target_amount'] }} by {{ s['deadline'] }}
+              <div class="progress mt-2">
+                <div class="progress-bar bg-success" role="progressbar"
+                  style="width: {{ (s['saved_amount'] / s['target_amount'] * 100) if s['target_amount'] > 0 else 0 }}%;"
+                  aria-valuenow="{{ s['saved_amount'] }}" aria-valuemin="0" aria-valuemax="{{ s['target_amount'] }}">
+                  {{ "%.0f"|format((s['saved_amount'] / s['target_amount']) * 100 if s['target_amount'] > 0 else 0) }}%
+                </div>
+              </div>
+            </li>
+          {% else %}
+            <li class="list-group-item text-muted">No savings goals set yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+       <!-- Flash Messages -->
+       {% with messages = get_flashed_messages(with_categories=true) %}
+       {% if messages %}
+         {% for category, message in messages %}
+           <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+             {{ message }}
+             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+           </div>
+         {% endfor %}
+       {% endif %}
+     {% endwith %}
+      <script>
+        function toggleDarkMode() {
+          document.body.classList.toggle('dark-mode');
+          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+        }
+      
+        window.onload = function () {
+          if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+          }
+        };
+      </script>
+
+      <footer class="text-center mt-5">
+        <hr>
+        <p class="text-muted">&copy; 2025 - Your Financial Freedom Begins With Us</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -24,7 +24,7 @@ Installation & Setup
 
 Clone the repository:
 
-git clone https://github.com/rickie-blip/personal-finance-manager.git
+git clone https://github.com/rickie-blip/Finance-manager.git
 cd personal-finance-manager
 
 

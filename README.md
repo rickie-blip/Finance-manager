@@ -24,7 +24,7 @@ Installation & Setup
 
 Clone the repository:
 
-git clone https://github.com/your-username/personal-finance-manager.git
+git clone https://github.com/rickie-blip/personal-finance-manager.git
 cd personal-finance-manager
 
 
@@ -47,11 +47,8 @@ Future Improvements
 
 📱 Mobile app integration
 
-📤 Export reports to PDF/Excel
-
 🤖 AI-driven spending insights
 
 License
 
-This project is licensed under the MIT License – see the LICENSE
  file for details.# Finance-manager
